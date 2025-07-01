@@ -23,7 +23,7 @@ extern "C"
         single_mat *data;
     } c_matrix;
 
-    c_matrix create_matrix(double *arr, int x, int y);
+    c_matrix create_matrix(const double *arr, int _rows, int _cols);
 
     void print_matrix(const c_matrix *mat);
 
@@ -35,8 +35,10 @@ extern "C"
 
     double determinant(const c_matrix *mat);
 
-    // math
+    c_matrix transpose(const c_matrix *mat);
 
+    // math
+    c_matrix inverse(const c_matrix *mat);
     c_matrix addition(const c_matrix *mat1, const c_matrix *mat2);
     c_matrix substraction(const c_matrix *mat1, const c_matrix *mat2);
     c_matrix multiply(const c_matrix *mat1, const c_matrix *mat2);

@@ -1,5 +1,6 @@
 #include "matrix/matrix.hpp"
 #include <iostream>
+#include <iomanip>
 
 matrix::Matrix::Matrix(int size_x, int size_y, const std::vector<double> &data) : _rows(size_x), _cols(size_y), _data(data)
 {
@@ -36,17 +37,44 @@ void matrix::Matrix::print_matrix() const
     ::free_matrix(&mat);
 }
 
-double matrix::Matrix::operator()(int row, int col) const
+matrix::Matrix matrix::Matrix::transpose(matrix::Matrix &mat)
+{
+    ::c_matrix matr = create_matrix(const_cast<double *>(mat._data.data()), mat._rows, mat._cols);
+    ::c_matrix transposed = ::transpose(&matr);
+    Matrix res(&transposed);
+    ::free_matrix(&transposed);
+    return res;
+}
+
+double matrix::Matrix::operator()(int row, int col) const // getter
 {
     return _data[row * _cols + col];
 }
+
+double &matrix::Matrix::operator()(int row, int col) // setter
+{
+    return _data[row * _cols + col];
+}
+
+matrix::Matrix &matrix::Matrix::operator=(const Matrix &other)
+{
+    if (this == &other)
+        return *this;
+    _rows = other._rows;
+    _cols = other._cols;
+    _data = other._data;
+
+    return *this;
+}
+
+// math
 
 matrix::Matrix matrix::Matrix::inverse() const
 {
     if (_rows != _cols)
         throw std::invalid_argument("Only square matrices can be inverted");
 
-    int det = determinant();
+    double det = determinant();
     if (det == 0)
         throw std::runtime_error("Matrix is singular and cannot be inverted");
 
@@ -95,19 +123,6 @@ matrix::Matrix matrix::Matrix::inverse() const
     return Matrix(n, n, inverse_data);
 }
 
-matrix::Matrix &matrix::Matrix::operator=(const Matrix &other)
-{
-    if (this == &other)
-        return *this;
-    _rows = other._rows;
-    _cols = other._cols;
-    _data = other._data;
-
-    return *this;
-}
-
-// math
-
 matrix::Matrix matrix::Matrix::operator+(const Matrix &other) const // addition
 {
     if (_rows != other._rows || _cols != other._cols)
@@ -154,11 +169,14 @@ matrix::Matrix matrix::Matrix::operator/(const Matrix &other) const // division
 
 std::ostream &matrix::operator<<(std::ostream &os, const matrix::Matrix &mat)
 {
+    int cell_width = 5; // можно изменить на 6 или больше
+    // os << std::fixed << std::setprecision(2);
+
     for (int i = 0; i < mat.height(); ++i)
     {
         for (int j = 0; j < mat.width(); ++j)
         {
-            os << "| " << mat.data()[i * mat.width() + j] << " ";
+            os << "| " << std::setw(cell_width) << mat(i, j) << " ";
         }
         os << "|\n";
     }

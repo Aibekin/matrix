@@ -28,8 +28,10 @@ namespace matrix
         void print_matrix() const;
 
         // int find(int row, int col) const;
+        static Matrix transpose(Matrix &mat);
 
         double operator()(int row, int col) const;
+        double &operator()(int row, int col);
         Matrix &operator=(const Matrix &other);
         Matrix operator+(const Matrix &other) const;
         Matrix operator-(const Matrix &other) const;
