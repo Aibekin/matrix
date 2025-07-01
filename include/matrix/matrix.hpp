@@ -26,8 +26,9 @@ namespace matrix
 
         void print_matrix() const;
 
-        int find(int row, int col) const;
+        // int find(int row, int col) const;
 
+        int operator()(int row, int col) const;
         Matrix &operator=(const Matrix &other);
         Matrix operator+(const Matrix &other) const;
         Matrix operator-(const Matrix &other) const;
