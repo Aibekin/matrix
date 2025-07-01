@@ -17,8 +17,9 @@ namespace matrix
 
     public:
         Matrix(int size_x, int size_y, const std::vector<double> &data);
+        Matrix(const ::c_matrix *mat);
 
-        int determinant() const;
+        double determinant() const;
 
         const std::vector<double> &data() const;
         int width() const;

@@ -27,7 +27,7 @@ void print_matrix(const c_matrix *mat)
     {
         for (int j = 0; j < mat->size_x; ++j)
         {
-            printf("| %d ", mat->data[i * mat->size_x + j].value);
+            printf("| %lf ", mat->data[i * mat->size_x + j].value);
         }
         printf("|\n\n");
     }
@@ -39,7 +39,7 @@ void free_matrix(c_matrix *mat)
     mat->data = NULL;
 }
 
-int find(const c_matrix *mat, int row, int col)
+double find(const c_matrix *mat, int row, int col)
 {
     if (!mat || row < 0 || col < 0 || row >= mat->size_y || col >= mat->size_x)
         return 0;
@@ -75,7 +75,7 @@ void make_minor(const c_matrix *mat, c_matrix *newmat, int exclude_row, int excl
     }
 }
 
-int determinant(const c_matrix *mat)
+double determinant(const c_matrix *mat)
 {
     if (mat->size_x == 1)
     {
@@ -100,4 +100,66 @@ int determinant(const c_matrix *mat)
         res += sign * temp * det;
     }
     return res;
+}
+
+// math
+
+c_matrix addition(const c_matrix *mat1, const c_matrix *mat2)
+{
+    double *arr = malloc(sizeof(single_mat) * mat1->size_x * mat1->size_y);
+    if (mat1->size_x != mat2->size_x || mat1->size_y != mat2->size_y)
+    {
+        return create_matrix(arr, mat1->size_x, mat1->size_y);
+    }
+    for (int i = 0; i < mat1->size_x * mat1->size_y; ++i)
+    {
+        arr[i] = mat1->data[i].value + mat2->data[i].value;
+    }
+
+    return create_matrix(arr, mat1->size_x, mat1->size_y);
+}
+
+c_matrix substraction(const c_matrix *mat1, const c_matrix *mat2)
+{
+    double *arr = malloc(sizeof(single_mat) * mat1->size_x * mat1->size_y);
+    if (mat1->size_x != mat2->size_x || mat1->size_y != mat2->size_y)
+    {
+        return create_matrix(arr, mat1->size_x, mat1->size_y);
+    }
+    for (int i = 0; i < mat1->size_x * mat1->size_y; ++i)
+    {
+        arr[i] = mat1->data[i].value - mat2->data[i].value;
+    }
+
+    return create_matrix(arr, mat1->size_x, mat1->size_y);
+}
+
+c_matrix multiply(const c_matrix *mat1, const c_matrix *mat2)
+{
+    double *arr = malloc(sizeof(single_mat) * mat1->size_x * mat1->size_y);
+    if (mat1->size_x != mat2->size_x || mat1->size_y != mat2->size_y)
+    {
+        return create_matrix(arr, mat1->size_x, mat1->size_y);
+    }
+    for (int i = 0; i < mat1->size_x * mat1->size_y; ++i)
+    {
+        arr[i] = mat1->data[i].value * mat2->data[i].value;
+    }
+
+    return create_matrix(arr, mat1->size_x, mat1->size_y);
+}
+
+c_matrix division(const c_matrix *mat1, const c_matrix *mat2)
+{
+    double *arr = malloc(sizeof(single_mat) * mat1->size_x * mat1->size_y);
+    if (mat1->size_x != mat2->size_x || mat1->size_y != mat2->size_y)
+    {
+        return create_matrix(arr, mat1->size_x, mat1->size_y);
+    }
+    for (int i = 0; i < mat1->size_x * mat1->size_y; ++i)
+    {
+        arr[i] = mat1->data[i].value / mat2->data[i].value;
+    }
+
+    return create_matrix(arr, mat1->size_x, mat1->size_y);
 }

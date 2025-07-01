@@ -29,11 +29,18 @@ extern "C"
 
     void free_matrix(c_matrix *mat);
 
-    int find(const c_matrix *mat, int row, int col);
+    double find(const c_matrix *mat, int row, int col);
 
     void make_minor(const c_matrix *mat, c_matrix *newmat, int exclude_row, int exclude_col);
 
-    int determinant(const c_matrix *mat);
+    double determinant(const c_matrix *mat);
+
+    // math
+
+    c_matrix addition(const c_matrix *mat1, const c_matrix *mat2);
+    c_matrix substraction(const c_matrix *mat1, const c_matrix *mat2);
+    c_matrix multiply(const c_matrix *mat1, const c_matrix *mat2);
+    c_matrix division(const c_matrix *mat1, const c_matrix *mat2);
 
 #ifdef __cplusplus
 }

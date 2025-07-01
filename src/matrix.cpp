@@ -1,14 +1,23 @@
 #include "matrix/matrix.hpp"
 #include <iostream>
 
-matrix::Matrix::Matrix(int size_x, int size_y, const std::vector<double> &data)
-    : _size_x(size_x), _size_y(size_y), _data(data)
+matrix::Matrix::Matrix(int size_x, int size_y, const std::vector<double> &data) : _size_x(size_x), _size_y(size_y), _data(data)
 {
     if (data.size() != static_cast<size_t>(size_x * size_y))
         throw std::invalid_argument("Matrix dimensions do not match data size");
 }
 
-int matrix::Matrix::determinant() const
+matrix::Matrix::Matrix(const ::c_matrix *mat) : _size_x(mat->size_x), _size_y(mat->size_y)
+{
+    int total = _size_x * _size_y;
+    _data.reserve(total);
+    for (int i = 0; i < total; ++i)
+    {
+        _data.push_back(mat->data[i].value);
+    }
+}
+
+double matrix::Matrix::determinant() const
 {
     ::c_matrix mat = create_matrix(const_cast<double *>(_data.data()), _size_x, _size_y);
     int result = ::determinant(&mat);
@@ -22,7 +31,7 @@ int matrix::Matrix::height() const { return _size_y; }
 
 void matrix::Matrix::print_matrix() const
 {
-    ::c_matrix mat = create_matrix(const_cast<double *>(_data.data()), _size_x, _size_y);
+    ::c_matrix mat = ::create_matrix(const_cast<double *>(_data.data()), _size_x, _size_y);
     ::print_matrix(&mat);
     ::free_matrix(&mat);
 }
@@ -97,49 +106,48 @@ matrix::Matrix &matrix::Matrix::operator=(const Matrix &other)
     return *this;
 }
 
-matrix::Matrix matrix::Matrix::operator+(const Matrix &other) const // сложение
+// math
+
+matrix::Matrix matrix::Matrix::operator+(const Matrix &other) const // addition
 {
     if (_size_x != other._size_x || _size_y != other._size_y)
         throw std::invalid_argument("Matrix sizes do not match");
 
-    std::vector<double> result_data(_size_x * _size_y);
-    for (int i = 0; i < _size_x * _size_y; ++i)
-    {
-        result_data[i] = _data[i] + other._data[i];
-    }
-
-    return Matrix(_size_x, _size_y, result_data);
+    ::c_matrix temp1 = create_matrix(const_cast<double *>(_data.data()), _size_x, _size_y);
+    ::c_matrix temp2 = create_matrix(const_cast<double *>(other._data.data()), _size_x, _size_y);
+    ::c_matrix temp_result = addition(&temp1, &temp2);
+    matrix::Matrix result(&temp_result);
+    ::free_matrix(&temp_result);
+    return result;
 }
 
-matrix::Matrix matrix::Matrix::operator-(const Matrix &other) const // вычитание
+matrix::Matrix matrix::Matrix::operator-(const Matrix &other) const // substraction
 {
     if (_size_x != other._size_x || _size_y != other._size_y)
         throw std::invalid_argument("Matrix sizes do not match");
 
-    std::vector<double> result_data(_size_x * _size_y);
-    for (int i = 0; i < _size_x * _size_y; ++i)
-    {
-        result_data[i] = _data[i] - other._data[i];
-    }
-
-    return Matrix(_size_x, _size_y, result_data);
+    ::c_matrix temp1 = create_matrix(const_cast<double *>(_data.data()), _size_x, _size_y);
+    ::c_matrix temp2 = create_matrix(const_cast<double *>(other._data.data()), _size_x, _size_y);
+    ::c_matrix temp_result = substraction(&temp1, &temp2);
+    matrix::Matrix result(&temp_result);
+    ::free_matrix(&temp_result);
+    return result;
 }
 
-matrix::Matrix matrix::Matrix::operator*(const Matrix &other) const // умножение
+matrix::Matrix matrix::Matrix::operator*(const Matrix &other) const // multiply
 {
     if (_size_x != other._size_x || _size_y != other._size_y)
         throw std::invalid_argument("Matrix sizes do not match");
 
-    std::vector<double> result_data(_size_x * _size_y);
-    for (int i = 0; i < _size_x * _size_y; ++i)
-    {
-        result_data[i] = _data[i] * other._data[i];
-    }
-
-    return Matrix(_size_x, _size_y, result_data);
+    ::c_matrix temp1 = create_matrix(const_cast<double *>(_data.data()), _size_x, _size_y);
+    ::c_matrix temp2 = create_matrix(const_cast<double *>(other._data.data()), _size_x, _size_y);
+    ::c_matrix temp_result = multiply(&temp1, &temp2);
+    matrix::Matrix result(&temp_result);
+    ::free_matrix(&temp_result);
+    return result;
 }
 
-matrix::Matrix matrix::Matrix::operator/(const Matrix &other) const // деление
+matrix::Matrix matrix::Matrix::operator/(const Matrix &other) const // division
 {
     return *this * other.inverse();
 }
