@@ -27,6 +27,13 @@ void matrix::Matrix::print_matrix() const
     ::free_matrix(&mat);
 }
 
+int matrix::Matrix::find(int row, int col) const
+{
+    ::c_matrix mat = create_matrix(const_cast<double *>(_data.data()), _size_x, _size_y);
+
+    return ::find(&mat, row, col);
+}
+
 matrix::Matrix matrix::Matrix::inverse() const
 {
     if (_size_x != _size_y)

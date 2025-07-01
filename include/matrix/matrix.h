@@ -29,6 +29,8 @@ extern "C"
 
     void free_matrix(c_matrix *mat);
 
+    int find(const c_matrix *mat, int row, int col);
+
     void make_minor(const c_matrix *mat, c_matrix *newmat, int exclude_row, int exclude_col);
 
     int determinant(const c_matrix *mat);

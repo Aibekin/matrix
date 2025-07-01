@@ -13,6 +13,7 @@ namespace matrix
         int _size_x;
         int _size_y;
         std::vector<double> _data;
+        Matrix inverse() const;
 
     public:
         Matrix(int size_x, int size_y, const std::vector<double> &data);
@@ -25,7 +26,7 @@ namespace matrix
 
         void print_matrix() const;
 
-        Matrix inverse() const;
+        int find(int row, int col) const;
 
         Matrix &operator=(const Matrix &other);
         Matrix operator+(const Matrix &other) const;

@@ -39,6 +39,14 @@ void free_matrix(c_matrix *mat)
     mat->data = NULL;
 }
 
+int find(const c_matrix *mat, int row, int col)
+{
+    if (!mat || row < 0 || col < 0 || row >= mat->size_y || col >= mat->size_x)
+        return 0;
+
+    return mat->data[row * mat->size_x + col].value;
+}
+
 void make_minor(const c_matrix *mat, c_matrix *newmat, int exclude_row, int exclude_col)
 {
     newmat->size_x = mat->size_x - 1;
