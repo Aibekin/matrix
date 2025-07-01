@@ -18,8 +18,8 @@ extern "C"
 
     typedef struct c_matrix
     {
-        int size_x;
-        int size_y;
+        int rows;
+        int cols;
         single_mat *data;
     } c_matrix;
 

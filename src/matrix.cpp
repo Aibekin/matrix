@@ -1,15 +1,15 @@
 #include "matrix/matrix.hpp"
 #include <iostream>
 
-matrix::Matrix::Matrix(int size_x, int size_y, const std::vector<double> &data) : _size_x(size_x), _size_y(size_y), _data(data)
+matrix::Matrix::Matrix(int size_x, int size_y, const std::vector<double> &data) : _rows(size_x), _cols(size_y), _data(data)
 {
     if (data.size() != static_cast<size_t>(size_x * size_y))
         throw std::invalid_argument("Matrix dimensions do not match data size");
 }
 
-matrix::Matrix::Matrix(const ::c_matrix *mat) : _size_x(mat->size_x), _size_y(mat->size_y)
+matrix::Matrix::Matrix(const ::c_matrix *mat) : _rows(mat->rows), _cols(mat->cols)
 {
-    int total = _size_x * _size_y;
+    int total = _rows * _cols;
     _data.reserve(total);
     for (int i = 0; i < total; ++i)
     {
@@ -19,38 +19,38 @@ matrix::Matrix::Matrix(const ::c_matrix *mat) : _size_x(mat->size_x), _size_y(ma
 
 double matrix::Matrix::determinant() const
 {
-    ::c_matrix mat = create_matrix(const_cast<double *>(_data.data()), _size_x, _size_y);
-    int result = ::determinant(&mat);
+    ::c_matrix mat = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    double result = ::determinant(&mat);
     ::free_matrix(&mat);
     return result;
 }
 
 const std::vector<double> &matrix::Matrix::data() const { return _data; }
-int matrix::Matrix::width() const { return _size_x; }
-int matrix::Matrix::height() const { return _size_y; }
+int matrix::Matrix::width() const { return _cols; }
+int matrix::Matrix::height() const { return _rows; }
 
 void matrix::Matrix::print_matrix() const
 {
-    ::c_matrix mat = ::create_matrix(const_cast<double *>(_data.data()), _size_x, _size_y);
+    ::c_matrix mat = ::create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
     ::print_matrix(&mat);
     ::free_matrix(&mat);
 }
 
-int matrix::Matrix::operator()(int row, int col) const
+double matrix::Matrix::operator()(int row, int col) const
 {
-    return _data[row * _size_x + col];
+    return _data[row * _cols + col];
 }
 
 matrix::Matrix matrix::Matrix::inverse() const
 {
-    if (_size_x != _size_y)
+    if (_rows != _cols)
         throw std::invalid_argument("Only square matrices can be inverted");
 
     int det = determinant();
     if (det == 0)
         throw std::runtime_error("Matrix is singular and cannot be inverted");
 
-    int n = _size_x;
+    int n = _rows;
     std::vector<double> cofactors(n * n);
 
     for (int row = 0; row < n; ++row)
@@ -71,7 +71,7 @@ matrix::Matrix matrix::Matrix::inverse() const
             }
 
             matrix::Matrix minor_matrix(n - 1, n - 1, minor);
-            int minor_det = minor_matrix.determinant();
+            double minor_det = minor_matrix.determinant();
 
             cofactors[row * n + col] = ((row + col) % 2 == 0 ? 1 : -1) * minor_det;
         }
@@ -99,8 +99,8 @@ matrix::Matrix &matrix::Matrix::operator=(const Matrix &other)
 {
     if (this == &other)
         return *this;
-    _size_x = other._size_x;
-    _size_y = other._size_y;
+    _rows = other._rows;
+    _cols = other._cols;
     _data = other._data;
 
     return *this;
@@ -110,11 +110,11 @@ matrix::Matrix &matrix::Matrix::operator=(const Matrix &other)
 
 matrix::Matrix matrix::Matrix::operator+(const Matrix &other) const // addition
 {
-    if (_size_x != other._size_x || _size_y != other._size_y)
+    if (_rows != other._rows || _cols != other._cols)
         throw std::invalid_argument("Matrix sizes do not match");
 
-    ::c_matrix temp1 = create_matrix(const_cast<double *>(_data.data()), _size_x, _size_y);
-    ::c_matrix temp2 = create_matrix(const_cast<double *>(other._data.data()), _size_x, _size_y);
+    ::c_matrix temp1 = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    ::c_matrix temp2 = create_matrix(const_cast<double *>(other._data.data()), _rows, _cols);
     ::c_matrix temp_result = addition(&temp1, &temp2);
     matrix::Matrix result(&temp_result);
     ::free_matrix(&temp_result);
@@ -123,11 +123,11 @@ matrix::Matrix matrix::Matrix::operator+(const Matrix &other) const // addition
 
 matrix::Matrix matrix::Matrix::operator-(const Matrix &other) const // substraction
 {
-    if (_size_x != other._size_x || _size_y != other._size_y)
+    if (_rows != other._rows || _cols != other._cols)
         throw std::invalid_argument("Matrix sizes do not match");
 
-    ::c_matrix temp1 = create_matrix(const_cast<double *>(_data.data()), _size_x, _size_y);
-    ::c_matrix temp2 = create_matrix(const_cast<double *>(other._data.data()), _size_x, _size_y);
+    ::c_matrix temp1 = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    ::c_matrix temp2 = create_matrix(const_cast<double *>(other._data.data()), _rows, _cols);
     ::c_matrix temp_result = substraction(&temp1, &temp2);
     matrix::Matrix result(&temp_result);
     ::free_matrix(&temp_result);
@@ -136,11 +136,11 @@ matrix::Matrix matrix::Matrix::operator-(const Matrix &other) const // substract
 
 matrix::Matrix matrix::Matrix::operator*(const Matrix &other) const // multiply
 {
-    if (_size_x != other._size_x || _size_y != other._size_y)
+    if (_rows != other._rows || _cols != other._cols)
         throw std::invalid_argument("Matrix sizes do not match");
 
-    ::c_matrix temp1 = create_matrix(const_cast<double *>(_data.data()), _size_x, _size_y);
-    ::c_matrix temp2 = create_matrix(const_cast<double *>(other._data.data()), _size_x, _size_y);
+    ::c_matrix temp1 = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    ::c_matrix temp2 = create_matrix(const_cast<double *>(other._data.data()), _rows, _cols);
     ::c_matrix temp_result = multiply(&temp1, &temp2);
     matrix::Matrix result(&temp_result);
     ::free_matrix(&temp_result);

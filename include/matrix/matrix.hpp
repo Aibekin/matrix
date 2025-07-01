@@ -10,13 +10,13 @@ namespace matrix
     class Matrix
     {
     private:
-        int _size_x;
-        int _size_y;
+        int _rows;
+        int _cols;
         std::vector<double> _data;
         Matrix inverse() const;
 
     public:
-        Matrix(int size_x, int size_y, const std::vector<double> &data);
+        Matrix(int rows, int cols, const std::vector<double> &data);
         Matrix(const ::c_matrix *mat);
 
         double determinant() const;
@@ -29,7 +29,7 @@ namespace matrix
 
         // int find(int row, int col) const;
 
-        int operator()(int row, int col) const;
+        double operator()(int row, int col) const;
         Matrix &operator=(const Matrix &other);
         Matrix operator+(const Matrix &other) const;
         Matrix operator-(const Matrix &other) const;
