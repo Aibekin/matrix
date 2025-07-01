@@ -1,6 +1,5 @@
 #include "matrix/matrix.hpp"
 #include <iostream>
-#include <iomanip>
 
 matrix::Matrix::Matrix(int size_x, int size_y, const std::vector<double> &data) : _rows(size_x), _cols(size_y), _data(data)
 {
@@ -43,6 +42,14 @@ matrix::Matrix matrix::Matrix::transpose(matrix::Matrix &mat)
     ::c_matrix transposed = ::transpose(&matr);
     Matrix res(&transposed);
     ::free_matrix(&transposed);
+    return res;
+}
+
+coord matrix::Matrix::find_el(double el)
+{
+    ::c_matrix mat = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    coord res = ::find_el(&mat, el);
+    ::free_matrix(&mat);
     return res;
 }
 
@@ -169,7 +176,7 @@ matrix::Matrix matrix::Matrix::operator/(const Matrix &other) const // division
 
 std::ostream &matrix::operator<<(std::ostream &os, const matrix::Matrix &mat)
 {
-    int cell_width = 5; // можно изменить на 6 или больше
+    int cell_width = 5;
     // os << std::fixed << std::setprecision(2);
 
     for (int i = 0; i < mat.height(); ++i)

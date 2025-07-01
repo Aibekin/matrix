@@ -8,6 +8,11 @@
 extern "C"
 {
 #endif
+    typedef struct coord
+    {
+        int row;
+        int col;
+    } coord;
 
     typedef struct single_mat
     {
@@ -30,6 +35,8 @@ extern "C"
     void free_matrix(c_matrix *mat);
 
     double find(const c_matrix *mat, int row, int col);
+
+    coord find_el(const c_matrix *mat, double el);
 
     void make_minor(const c_matrix *mat, c_matrix *newmat, int exclude_row, int exclude_col);
 

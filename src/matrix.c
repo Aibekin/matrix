@@ -47,6 +47,24 @@ double find(const c_matrix *mat, int row, int col)
 	return mat->data[row * mat->cols + col].value;
 }
 
+coord find_el(const c_matrix *mat, double el)
+{
+	coord res = {-1, -1};
+	for (int row = 0; row < mat->rows; ++row)
+	{
+		for (int col = 0; col < mat->cols; ++col)
+		{
+			if (find(mat, row, col) == el)
+			{
+				res.row = row;
+				res.col = col;
+				return res;
+			}
+		}
+	}
+	return res;
+}
+
 void make_minor(const c_matrix *mat, c_matrix *newmat, int exclude_row, int exclude_col)
 {
 	newmat->rows = mat->rows - 1;

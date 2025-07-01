@@ -2,6 +2,7 @@
 #define MATRIX_HPP
 
 #include "matrix/matrix.h"
+#include "matrix/matrix_output.hpp"
 #include <vector>
 #include <ostream>
 
@@ -29,6 +30,8 @@ namespace matrix
 
         // int find(int row, int col) const;
         static Matrix transpose(Matrix &mat);
+
+        coord find_el(double el);
 
         double operator()(int row, int col) const;
         double &operator()(int row, int col);
