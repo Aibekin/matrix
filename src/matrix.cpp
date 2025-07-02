@@ -1,54 +1,86 @@
 #include "matrix/matrix.hpp"
 #include <iostream>
 
-matrix::Matrix::Matrix(int size_x, int size_y, const std::vector<double> &data) : _rows(size_x), _cols(size_y), _data(data)
+matrix::Matrix::Matrix(int rows, int cols, const std::vector<double> &data) : _rows(rows), _cols(cols)
 {
-    if (data.size() != static_cast<size_t>(size_x * size_y))
+    if (data.size() != static_cast<size_t>(rows * cols))
         throw std::invalid_argument("Matrix dimensions do not match data size");
+    _data.resize(rows * cols);
+    for (int row = 0; row < rows; ++row)
+    {
+        for (int col = 0; col < cols; ++col)
+        {
+            _data[row * cols + col].value = data[row * cols + col];
+            _data[row * cols + col].row = row;
+            _data[row * cols + col].col = col;
+        }
+    }
 }
 
 matrix::Matrix::Matrix(const ::c_matrix *mat) : _rows(mat->rows), _cols(mat->cols)
 {
     int total = _rows * _cols;
-    _data.reserve(total);
-    for (int i = 0; i < total; ++i)
+    _data.resize(total);
+    for (int row = 0; row < mat->rows; ++row)
     {
-        _data.push_back(mat->data[i].value);
+        for (int col = 0; col < mat->cols; ++col)
+        {
+            _data[row * mat->cols + col].value = mat->data[row * mat->cols + col].value;
+            _data[row * mat->cols + col].row = mat->data[row * mat->cols + col].row;
+            _data[row * mat->cols + col].col = mat->data[row * mat->cols + col].col;
+        }
     }
 }
 
 matrix::Matrix::Matrix(double value, int rows, int cols) : _rows(rows), _cols(cols)
 {
-    int total = rows * cols;
-    _data.reserve(total);
-    for (int i = 0; i < total; ++i)
+    int total = _rows * _cols;
+    _data.resize(total);
+    for (int row = 0; row < rows; ++row)
     {
-        _data.push_back(value);
+        for (int col = 0; col < cols; ++col)
+        {
+            _data[row * cols + col].value = value;
+            _data[row * cols + col].row = row;
+            _data[row * cols + col].col = col;
+        }
     }
+}
+
+std::vector<double> matrix::Matrix::to_raw_data() const
+{
+    std::vector<double> raw;
+    raw.reserve(_data.size());
+    for (const auto &el : _data)
+        raw.push_back(el.value);
+    return raw;
 }
 
 double matrix::Matrix::determinant() const
 {
-    ::c_matrix mat = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    std::vector<double> raw = to_raw_data();
+    ::c_matrix mat = create_matrix(const_cast<double *>(raw.data()), _rows, _cols);
     double result = ::determinant(&mat);
     ::free_matrix(&mat);
     return result;
 }
 
-const std::vector<double> &matrix::Matrix::data() const { return _data; }
+std::vector<double> matrix::Matrix::data() const { return to_raw_data(); }
 int matrix::Matrix::width() const { return _cols; }
 int matrix::Matrix::height() const { return _rows; }
 
 void matrix::Matrix::print_matrix() const
 {
-    ::c_matrix mat = ::create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    std::vector<double> raw = to_raw_data();
+    ::c_matrix mat = create_matrix(const_cast<double *>(raw.data()), _rows, _cols);
     ::print_matrix(&mat);
     ::free_matrix(&mat);
 }
 
-matrix::Matrix matrix::Matrix::transpose(matrix::Matrix &mat)
+matrix::Matrix matrix::Matrix::transpose() const
 {
-    ::c_matrix matr = create_matrix(const_cast<double *>(mat._data.data()), mat._rows, mat._cols);
+    std::vector<double> raw = to_raw_data();
+    ::c_matrix matr = create_matrix(const_cast<double *>(raw.data()), _rows, _cols);
     ::c_matrix transposed = ::transpose(&matr);
     Matrix res(&transposed);
     ::free_matrix(&transposed);
@@ -57,7 +89,8 @@ matrix::Matrix matrix::Matrix::transpose(matrix::Matrix &mat)
 
 coord matrix::Matrix::find_el(double el)
 {
-    ::c_matrix mat = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    std::vector<double> raw = to_raw_data();
+    ::c_matrix mat = create_matrix(const_cast<double *>(raw.data()), _rows, _cols);
     coord res = ::find_el(&mat, el);
     ::free_matrix(&mat);
     return res;
@@ -65,7 +98,8 @@ coord matrix::Matrix::find_el(double el)
 
 double matrix::Matrix::sum() const
 {
-    ::c_matrix mat = ::create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    std::vector<double> raw = to_raw_data();
+    ::c_matrix mat = create_matrix(const_cast<double *>(raw.data()), _rows, _cols);
     double res = ::sum_of_matrix(&mat);
     ::free_matrix(&mat);
     return res;
@@ -73,7 +107,8 @@ double matrix::Matrix::sum() const
 
 double matrix::Matrix::average() const
 {
-    ::c_matrix mat = ::create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    std::vector<double> raw = to_raw_data();
+    ::c_matrix mat = create_matrix(const_cast<double *>(raw.data()), _rows, _cols);
     double res = ::average_of_matrix(&mat);
     ::free_matrix(&mat);
     return res;
@@ -81,7 +116,8 @@ double matrix::Matrix::average() const
 
 double matrix::Matrix::min() const
 {
-    ::c_matrix mat = ::create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    std::vector<double> raw = to_raw_data();
+    ::c_matrix mat = create_matrix(const_cast<double *>(raw.data()), _rows, _cols);
     double res = ::min_of_matrix(&mat);
     ::free_matrix(&mat);
     return res;
@@ -89,7 +125,8 @@ double matrix::Matrix::min() const
 
 double matrix::Matrix::max() const
 {
-    ::c_matrix mat = ::create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    std::vector<double> raw = to_raw_data();
+    ::c_matrix mat = create_matrix(const_cast<double *>(raw.data()), _rows, _cols);
     double res = ::max_of_matrix(&mat);
     ::free_matrix(&mat);
     return res;
@@ -97,12 +134,12 @@ double matrix::Matrix::max() const
 
 double matrix::Matrix::operator()(int row, int col) const // getter
 {
-    return _data[row * _cols + col];
+    return _data[row * _cols + col].value;
 }
 
 double &matrix::Matrix::operator()(int row, int col) // setter
 {
-    return _data[row * _cols + col];
+    return _data[row * _cols + col].value;
 }
 
 matrix::Matrix &matrix::Matrix::operator=(const Matrix &other)
@@ -143,7 +180,7 @@ matrix::Matrix matrix::Matrix::inverse() const
                 {
                     if (j == col)
                         continue;
-                    minor.push_back(_data[i * n + j]);
+                    minor.push_back(_data[i * n + j].value);
                 }
             }
 
@@ -177,8 +214,10 @@ matrix::Matrix matrix::Matrix::operator+(const Matrix &other) const // addition
     if (_rows != other._rows || _cols != other._cols)
         throw std::invalid_argument("Matrix sizes do not match");
 
-    ::c_matrix temp1 = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
-    ::c_matrix temp2 = create_matrix(const_cast<double *>(other._data.data()), _rows, _cols);
+    std::vector<double> raw1 = to_raw_data();
+    ::c_matrix temp1 = create_matrix(const_cast<double *>(raw1.data()), _rows, _cols);
+    std::vector<double> raw2 = other.to_raw_data();
+    ::c_matrix temp2 = create_matrix(const_cast<double *>(raw2.data()), _rows, _cols);
     ::c_matrix temp_result = addition(&temp1, &temp2);
     matrix::Matrix result(&temp_result);
     ::free_matrix(&temp_result);
@@ -187,7 +226,8 @@ matrix::Matrix matrix::Matrix::operator+(const Matrix &other) const // addition
 
 matrix::Matrix matrix::Matrix::operator+(double value) const // add to scalar
 {
-    ::c_matrix temp = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    std::vector<double> raw = to_raw_data();
+    ::c_matrix temp = create_matrix(const_cast<double *>(raw.data()), _rows, _cols);
     ::add_matrix_to_scalar(&temp, value);
     Matrix mat(&temp);
     ::free_matrix(&temp);
@@ -199,8 +239,10 @@ matrix::Matrix matrix::Matrix::operator-(const Matrix &other) const // substract
     if (_rows != other._rows || _cols != other._cols)
         throw std::invalid_argument("Matrix sizes do not match");
 
-    ::c_matrix temp1 = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
-    ::c_matrix temp2 = create_matrix(const_cast<double *>(other._data.data()), _rows, _cols);
+    std::vector<double> raw1 = to_raw_data();
+    ::c_matrix temp1 = create_matrix(const_cast<double *>(raw1.data()), _rows, _cols);
+    std::vector<double> raw2 = other.to_raw_data();
+    ::c_matrix temp2 = create_matrix(const_cast<double *>(raw2.data()), _rows, _cols);
     ::c_matrix temp_result = substraction(&temp1, &temp2);
     matrix::Matrix result(&temp_result);
     ::free_matrix(&temp_result);
@@ -209,7 +251,8 @@ matrix::Matrix matrix::Matrix::operator-(const Matrix &other) const // substract
 
 matrix::Matrix matrix::Matrix::operator-(double value) const // substract from scalar
 {
-    ::c_matrix temp = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    std::vector<double> raw = to_raw_data();
+    ::c_matrix temp = create_matrix(const_cast<double *>(raw.data()), _rows, _cols);
     ::substract_matrix_from_scalar(&temp, value);
     Matrix mat(&temp);
     ::free_matrix(&temp);
@@ -221,8 +264,10 @@ matrix::Matrix matrix::Matrix::operator*(const Matrix &other) const // multiply
     if (_rows != other._rows || _cols != other._cols)
         throw std::invalid_argument("Matrix sizes do not match");
 
-    ::c_matrix temp1 = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
-    ::c_matrix temp2 = create_matrix(const_cast<double *>(other._data.data()), _rows, _cols);
+    std::vector<double> raw1 = to_raw_data();
+    ::c_matrix temp1 = create_matrix(const_cast<double *>(raw1.data()), _rows, _cols);
+    std::vector<double> raw2 = other.to_raw_data();
+    ::c_matrix temp2 = create_matrix(const_cast<double *>(raw2.data()), _rows, _cols);
     ::c_matrix temp_result = multiply(&temp1, &temp2);
     matrix::Matrix result(&temp_result);
     ::free_matrix(&temp_result);
@@ -231,7 +276,8 @@ matrix::Matrix matrix::Matrix::operator*(const Matrix &other) const // multiply
 
 matrix::Matrix matrix::Matrix::operator*(double value) const // multiply by scalar
 {
-    ::c_matrix temp = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    std::vector<double> raw = to_raw_data();
+    ::c_matrix temp = create_matrix(const_cast<double *>(raw.data()), _rows, _cols);
     ::multiply_matrix_by_scalar(&temp, value);
     Matrix mat(&temp);
     ::free_matrix(&temp);
@@ -245,7 +291,8 @@ matrix::Matrix matrix::Matrix::operator/(const Matrix &other) const // division
 
 matrix::Matrix matrix::Matrix::operator/(double value) const // divide by scalar
 {
-    ::c_matrix temp = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    std::vector<double> raw = to_raw_data();
+    ::c_matrix temp = create_matrix(const_cast<double *>(raw.data()), _rows, _cols);
     ::divide_matrix_by_scalar(&temp, value);
     Matrix mat(&temp);
     ::free_matrix(&temp);

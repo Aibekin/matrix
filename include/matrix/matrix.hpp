@@ -13,8 +13,9 @@ namespace matrix
     private:
         int _rows;
         int _cols;
-        std::vector<double> _data;
+        std::vector<::single_mat> _data;
         Matrix inverse() const;
+        std::vector<double> to_raw_data() const;
 
     public:
         Matrix(int rows, int cols, const std::vector<double> &data);
@@ -23,14 +24,14 @@ namespace matrix
 
         double determinant() const;
 
-        const std::vector<double> &data() const;
+        std::vector<double> data() const;
         int width() const;
         int height() const;
 
         void print_matrix() const;
 
         // int find(int row, int col) const;
-        static Matrix transpose(Matrix &mat);
+        Matrix transpose() const;
 
         coord find_el(double el);
 
