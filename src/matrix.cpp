@@ -17,6 +17,16 @@ matrix::Matrix::Matrix(const ::c_matrix *mat) : _rows(mat->rows), _cols(mat->col
     }
 }
 
+matrix::Matrix::Matrix(double value, int rows, int cols) : _rows(rows), _cols(cols)
+{
+    int total = rows * cols;
+    _data.reserve(total);
+    for (int i = 0; i < total; ++i)
+    {
+        _data.push_back(value);
+    }
+}
+
 double matrix::Matrix::determinant() const
 {
     ::c_matrix mat = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
@@ -175,6 +185,15 @@ matrix::Matrix matrix::Matrix::operator+(const Matrix &other) const // addition
     return result;
 }
 
+matrix::Matrix matrix::Matrix::operator+(double value) const // add to scalar
+{
+    ::c_matrix temp = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    ::add_matrix_to_scalar(&temp, value);
+    Matrix mat(&temp);
+    ::free_matrix(&temp);
+    return mat;
+}
+
 matrix::Matrix matrix::Matrix::operator-(const Matrix &other) const // substraction
 {
     if (_rows != other._rows || _cols != other._cols)
@@ -186,6 +205,15 @@ matrix::Matrix matrix::Matrix::operator-(const Matrix &other) const // substract
     matrix::Matrix result(&temp_result);
     ::free_matrix(&temp_result);
     return result;
+}
+
+matrix::Matrix matrix::Matrix::operator-(double value) const // substract from scalar
+{
+    ::c_matrix temp = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    ::substract_matrix_from_scalar(&temp, value);
+    Matrix mat(&temp);
+    ::free_matrix(&temp);
+    return mat;
 }
 
 matrix::Matrix matrix::Matrix::operator*(const Matrix &other) const // multiply
@@ -201,9 +229,27 @@ matrix::Matrix matrix::Matrix::operator*(const Matrix &other) const // multiply
     return result;
 }
 
+matrix::Matrix matrix::Matrix::operator*(double value) const // multiply by scalar
+{
+    ::c_matrix temp = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    ::multiply_matrix_by_scalar(&temp, value);
+    Matrix mat(&temp);
+    ::free_matrix(&temp);
+    return mat;
+}
+
 matrix::Matrix matrix::Matrix::operator/(const Matrix &other) const // division
 {
     return *this * other.inverse();
+}
+
+matrix::Matrix matrix::Matrix::operator/(double value) const // divide by scalar
+{
+    ::c_matrix temp = create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    ::divide_matrix_by_scalar(&temp, value);
+    Matrix mat(&temp);
+    ::free_matrix(&temp);
+    return mat;
 }
 
 std::ostream &matrix::operator<<(std::ostream &os, const matrix::Matrix &mat)

@@ -19,6 +19,7 @@ namespace matrix
     public:
         Matrix(int rows, int cols, const std::vector<double> &data);
         Matrix(const ::c_matrix *mat);
+        Matrix(double value, int rows, int cols);
 
         double determinant() const;
 
@@ -42,9 +43,13 @@ namespace matrix
         double &operator()(int row, int col);
         Matrix &operator=(const Matrix &other);
         Matrix operator+(const Matrix &other) const;
+        Matrix operator+(double value) const;
         Matrix operator-(const Matrix &other) const;
+        Matrix operator-(double value) const;
         Matrix operator*(const Matrix &other) const;
+        Matrix operator*(double value) const;
         Matrix operator/(const Matrix &other) const;
+        Matrix operator/(double value) const;
     };
 
     std::ostream &operator<<(std::ostream &os, const Matrix &mat);

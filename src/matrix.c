@@ -21,6 +21,34 @@ c_matrix create_matrix(const double *arr, int _rows, int _cols)
 	return mat;
 }
 
+c_matrix create_initial_matrix(double value, int _rows, int _cols)
+{
+	c_matrix mat;
+	mat.rows = _rows;
+	mat.cols = _cols;
+	mat.data = malloc(sizeof(single_mat) * _rows * _cols);
+	for (int row = 0; row < _rows; ++row)
+	{
+		for (int col = 0; col < _cols; ++col)
+		{
+			mat.data[row * _cols + col].value = value;
+			mat.data[row * _cols + col].row = row;
+			mat.data[row * _cols + col].col = col;
+		}
+	}
+	return mat;
+}
+
+c_matrix create_zeros(int _rows, int _cols)
+{
+	return create_initial_matrix(0.0, _rows, _cols);
+}
+
+c_matrix create_ones(int _rows, int _cols)
+{
+	return create_initial_matrix(1.0, _rows, _cols);
+}
+
 void print_matrix(const c_matrix *mat)
 {
 	for (int i = 0; i < mat->rows; ++i)
@@ -258,6 +286,50 @@ c_matrix division(const c_matrix *mat1, const c_matrix *mat2)
 	c_matrix res = multiply(mat1, &inv_mat);
 	free_matrix(&inv_mat);
 	return res;
+}
+
+void add_matrix_to_scalar(c_matrix *mat, double scalar)
+{
+	for (int row = 0; row < mat->rows; ++row)
+	{
+		for (int col = 0; col < mat->cols; ++col)
+		{
+			mat->data[row * mat->cols + col].value += scalar;
+		}
+	}
+}
+
+void substract_matrix_from_scalar(c_matrix *mat, double scalar)
+{
+	for (int row = 0; row < mat->rows; ++row)
+	{
+		for (int col = 0; col < mat->cols; ++col)
+		{
+			mat->data[row * mat->cols + col].value -= scalar;
+		}
+	}
+}
+
+void multiply_matrix_by_scalar(c_matrix *mat, double scalar)
+{
+	for (int row = 0; row < mat->rows; ++row)
+	{
+		for (int col = 0; col < mat->cols; ++col)
+		{
+			mat->data[row * mat->cols + col].value *= scalar;
+		}
+	}
+}
+
+void divide_matrix_by_scalar(c_matrix *mat, double scalar)
+{
+	for (int row = 0; row < mat->rows; ++row)
+	{
+		for (int col = 0; col < mat->cols; ++col)
+		{
+			mat->data[row * mat->cols + col].value /= scalar;
+		}
+	}
 }
 
 double sum_of_matrix(const c_matrix *mat)

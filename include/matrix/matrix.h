@@ -29,6 +29,9 @@ extern "C"
     } c_matrix;
 
     c_matrix create_matrix(const double *arr, int _rows, int _cols);
+    c_matrix create_initial_matrix(double value, int _rows, int _cols);
+    c_matrix create_zeros(int _rows, int _cols);
+    c_matrix create_ones(int _rows, int _cols);
 
     void print_matrix(const c_matrix *mat);
 
@@ -50,6 +53,11 @@ extern "C"
     c_matrix substraction(const c_matrix *mat1, const c_matrix *mat2);
     c_matrix multiply(const c_matrix *mat1, const c_matrix *mat2);
     c_matrix division(const c_matrix *mat1, const c_matrix *mat2);
+
+    void add_matrix_to_scalar(c_matrix *mat, double scalar);
+    void substract_matrix_from_scalar(c_matrix *mat, double scalar);
+    void multiply_matrix_by_scalar(c_matrix *mat, double scalar);
+    void divide_matrix_by_scalar(c_matrix *mat, double scalar);
 
     double sum_of_matrix(const c_matrix *mat);
     double average_of_matrix(const c_matrix *mat);
