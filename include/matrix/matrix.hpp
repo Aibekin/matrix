@@ -33,6 +33,11 @@ namespace matrix
 
         coord find_el(double el);
 
+        double sum() const;
+        double average() const;
+        double min() const;
+        double max() const;
+
         double operator()(int row, int col) const;
         double &operator()(int row, int col);
         Matrix &operator=(const Matrix &other);

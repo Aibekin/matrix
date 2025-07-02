@@ -259,3 +259,49 @@ c_matrix division(const c_matrix *mat1, const c_matrix *mat2)
 	free_matrix(&inv_mat);
 	return res;
 }
+
+double sum_of_matrix(const c_matrix *mat)
+{
+	double res = 0;
+	for (int row = 0; row < mat->rows; ++row)
+	{
+		for (int col = 0; col < mat->cols; ++col)
+		{
+			res += mat->data[row * mat->cols + col].value;
+		}
+	}
+	return res;
+}
+
+double average_of_matrix(const c_matrix *mat)
+{
+	return sum_of_matrix(mat) / (mat->cols * mat->rows);
+}
+
+double min_of_matrix(const c_matrix *mat)
+{
+	double min = mat->data[0].value;
+	for (int row = 0; row < mat->rows; ++row)
+	{
+		for (int col = 0; col < mat->cols; ++col)
+		{
+			if (min >= mat->data[row * mat->cols + col].value)
+				min = mat->data[row * mat->cols + col].value;
+		}
+	}
+	return min;
+}
+
+double max_of_matrix(const c_matrix *mat)
+{
+	double min = mat->data[0].value;
+	for (int row = 0; row < mat->rows; ++row)
+	{
+		for (int col = 0; col < mat->cols; ++col)
+		{
+			if (min <= mat->data[row * mat->cols + col].value)
+				min = mat->data[row * mat->cols + col].value;
+		}
+	}
+	return min;
+}

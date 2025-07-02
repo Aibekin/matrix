@@ -53,6 +53,38 @@ coord matrix::Matrix::find_el(double el)
     return res;
 }
 
+double matrix::Matrix::sum() const
+{
+    ::c_matrix mat = ::create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    double res = ::sum_of_matrix(&mat);
+    ::free_matrix(&mat);
+    return res;
+}
+
+double matrix::Matrix::average() const
+{
+    ::c_matrix mat = ::create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    double res = ::average_of_matrix(&mat);
+    ::free_matrix(&mat);
+    return res;
+}
+
+double matrix::Matrix::min() const
+{
+    ::c_matrix mat = ::create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    double res = ::min_of_matrix(&mat);
+    ::free_matrix(&mat);
+    return res;
+}
+
+double matrix::Matrix::max() const
+{
+    ::c_matrix mat = ::create_matrix(const_cast<double *>(_data.data()), _rows, _cols);
+    double res = ::max_of_matrix(&mat);
+    ::free_matrix(&mat);
+    return res;
+}
+
 double matrix::Matrix::operator()(int row, int col) const // getter
 {
     return _data[row * _cols + col];

@@ -51,6 +51,11 @@ extern "C"
     c_matrix multiply(const c_matrix *mat1, const c_matrix *mat2);
     c_matrix division(const c_matrix *mat1, const c_matrix *mat2);
 
+    double sum_of_matrix(const c_matrix *mat);
+    double average_of_matrix(const c_matrix *mat);
+    double min_of_matrix(const c_matrix *mat);
+    double max_of_matrix(const c_matrix *mat);
+
 #ifdef __cplusplus
 }
 #endif
