@@ -40,6 +40,10 @@ namespace matrix
         double min() const;
         double max() const;
 
+        Matrix submatrix(int row_start, int col_start, int row_end, int col_end);
+        void append_rows(const Matrix &mat);
+        void append_cols(const Matrix &mat);
+
         double operator()(int row, int col) const;
         double &operator()(int row, int col);
         Matrix &operator=(const Matrix &other);

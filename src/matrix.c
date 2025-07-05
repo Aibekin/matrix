@@ -117,3 +117,68 @@ double max_of_matrix(const c_matrix *mat)
 	}
 	return min;
 }
+
+c_matrix submatrix(const c_matrix *mat, int row_start, int col_start, int row_end, int col_end)
+{
+	if (row_start < 0 || row_end >= mat->rows || col_start < 0 || col_end >= mat->cols)
+	{
+		fprintf(stderr, "Submatrix indices out of bounds\n");
+		exit(EXIT_FAILURE);
+	}
+
+	int rows = row_end - row_start + 1;
+	int cols = col_end - col_start + 1;
+	double *arr = malloc(sizeof(double) * rows * cols);
+
+	for (int row = 0; row < rows; ++row)
+	{
+		for (int col = 0; col < cols; ++col)
+		{
+			arr[row * cols + col] = mat->data[(row_start + row) * mat->cols + (col_start + col)].value;
+		}
+	}
+	c_matrix sub_mat = create_matrix(arr, rows, cols);
+	free(arr);
+	return sub_mat;
+}
+
+c_matrix append_rows(const c_matrix *src_mat, const c_matrix *mat_bottom)
+{
+	int rows = src_mat->rows + mat_bottom->rows;
+	int cols = src_mat->cols;
+
+	double *arr = malloc(sizeof(double) * rows * cols);
+
+	for (int row = 0; row < src_mat->rows; ++row)
+	{
+		for (int col = 0; col < src_mat->cols; ++col)
+			arr[row * cols + col] = src_mat->data[row * src_mat->cols + col].value;
+	}
+	for (int row = 0; row < mat_bottom->rows; ++row)
+	{
+		for (int col = 0; col < mat_bottom->cols; ++col)
+			arr[(src_mat->rows + row) * cols + col] = mat_bottom->data[row * mat_bottom->cols + col].value;
+	}
+	c_matrix mat = create_matrix(arr, rows, cols);
+	free(arr);
+	return mat;
+}
+
+c_matrix append_cols(const c_matrix *src_mat, const c_matrix *mat_right)
+{
+	int rows = src_mat->rows;
+	int cols = src_mat->cols + mat_right->cols;
+
+	double *arr = malloc(sizeof(double) * rows * cols);
+
+	for (int row = 0; row < rows; ++row)
+	{
+		for (int col = 0; col < src_mat->cols; ++col)
+			arr[row * cols + col] = src_mat->data[row * src_mat->cols + col].value;
+		for (int col = 0; col < mat_right->cols; ++col)
+			arr[row * cols + (src_mat->cols + col)] = mat_right->data[row * mat_right->cols + col].value;
+	}
+	c_matrix mat = create_matrix(arr, rows, cols);
+	free(arr);
+	return mat;
+}
