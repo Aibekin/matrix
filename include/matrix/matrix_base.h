@@ -3,6 +3,11 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <assert.h>
+
+#define MAT_AT(m, i, j) (m)->data[(i) * (m)->cols + (j)]
+#define MATS_AT(m, n, i, j) (m)->data[(i) * (n) + (j)]
+#define PRINT_MATRIX(mat) print_matrix(&mat, #mat, 0);
 
 #ifdef __cplusplus
 extern "C"
@@ -29,8 +34,11 @@ extern "C"
         single_mat *data;
     } c_matrix;
 
+    c_matrix alloc_matrix(int _rows, int _cols);
+    void fill_matrix(c_matrix *mat, const double *arr);
     c_matrix create_matrix(const double *arr, int _rows, int _cols);
-    void print_matrix(const c_matrix *mat);
+    c_matrix *alloc_matrix_array(int _amount);
+    void print_matrix(const c_matrix *mat, const char *name, size_t padding);
     void free_matrix(c_matrix *mat);
 
 #ifdef __cplusplus

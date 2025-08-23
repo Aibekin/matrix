@@ -28,7 +28,7 @@ namespace matrix
         int width() const;
         int height() const;
 
-        void print_matrix() const;
+        void print() const;
 
         // int find(int row, int col) const;
         Matrix transpose() const;

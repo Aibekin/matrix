@@ -11,9 +11,9 @@ c_matrix create_initial_matrix(double value, int _rows, int _cols)
 	{
 		for (int col = 0; col < _cols; ++col)
 		{
-			mat.data[row * _cols + col].value = value;
-			mat.data[row * _cols + col].row = row;
-			mat.data[row * _cols + col].col = col;
+			MAT_AT(&mat, row, col).value = value;
+			MAT_AT(&mat, row, col).row = row;
+			MAT_AT(&mat, row, col).col = col;
 		}
 	}
 	return mat;
@@ -29,10 +29,35 @@ c_matrix create_ones(int _rows, int _cols)
 	return create_initial_matrix(1.0, _rows, _cols);
 }
 
-c_matrix create_random(int _rows, int _cols)
+c_matrix create_random(int _rows, int _cols, double low, double high)
 {
-	double random = (double)rand() / (double)RAND_MAX;
-	return create_initial_matrix(random, _rows, _cols);
+	c_matrix mat;
+	mat.rows = _rows;
+	mat.cols = _cols;
+	mat.data = malloc(sizeof(single_mat) * _rows * _cols);
+	for (int row = 0; row < _rows; ++row)
+	{
+		for (int col = 0; col < _cols; ++col)
+		{
+			MAT_AT(&mat, row, col).value = (double)rand() / (double)RAND_MAX * (high - low) + low;
+			MAT_AT(&mat, row, col).row = row;
+			MAT_AT(&mat, row, col).col = col;
+		}
+	}
+	return mat;
+}
+
+void copy_matrix(c_matrix *dst, c_matrix *src)
+{
+	assert(dst->rows == src->rows);
+	assert(dst->cols == src->cols);
+	for (int i = 0; i < dst->rows; ++i)
+	{
+		for (int j = 0; j < dst->cols; ++j)
+		{
+			MAT_AT(dst, i, j) = MAT_AT(src, i, j);
+		}
+	}
 }
 
 double find(const c_matrix *mat, int row, int col)
@@ -40,7 +65,7 @@ double find(const c_matrix *mat, int row, int col)
 	if (!mat || row < 0 || col < 0 || row >= mat->rows || col >= mat->cols)
 		return 0;
 
-	return mat->data[row * mat->cols + col].value;
+	return MAT_AT(mat, row, col).value;
 }
 
 coord find_el(const c_matrix *mat, double el)
@@ -70,7 +95,7 @@ c_matrix transpose(const c_matrix *mat)
 	{
 		for (int j = 0; j < cols; ++j)
 		{
-			arr[i * cols + j] = mat->data[j * rows + i].value;
+			arr[i * cols + j] = MAT_AT(mat, i, j).value;
 		}
 	}
 	c_matrix res = create_matrix(arr, rows, cols);
@@ -85,7 +110,7 @@ double sum_of_matrix(const c_matrix *mat)
 	{
 		for (int col = 0; col < mat->cols; ++col)
 		{
-			res += mat->data[row * mat->cols + col].value;
+			res += MAT_AT(mat, row, col).value;
 		}
 	}
 	return res;
@@ -103,8 +128,8 @@ double min_of_matrix(const c_matrix *mat)
 	{
 		for (int col = 0; col < mat->cols; ++col)
 		{
-			if (min >= mat->data[row * mat->cols + col].value)
-				min = mat->data[row * mat->cols + col].value;
+			if (min >= MAT_AT(mat, row, col).value)
+				min = MAT_AT(mat, row, col).value;
 		}
 	}
 	return min;
@@ -117,8 +142,8 @@ double max_of_matrix(const c_matrix *mat)
 	{
 		for (int col = 0; col < mat->cols; ++col)
 		{
-			if (min <= mat->data[row * mat->cols + col].value)
-				min = mat->data[row * mat->cols + col].value;
+			if (min <= MAT_AT(mat, row, col).value)
+				min = MAT_AT(mat, row, col).value;
 		}
 	}
 	return min;
@@ -140,12 +165,72 @@ c_matrix submatrix(const c_matrix *mat, int row_start, int col_start, int row_en
 	{
 		for (int col = 0; col < cols; ++col)
 		{
-			arr[row * cols + col] = mat->data[(row_start + row) * mat->cols + (col_start + col)].value;
+			// arr[row * cols + col] = mat->data[(row_start + row) * mat->cols + (col_start + col)].value;
+			arr[row * cols + col] = MAT_AT(mat, (row_start + row), (col_start + col)).value;
 		}
 	}
 	c_matrix sub_mat = create_matrix(arr, rows, cols);
 	free(arr);
 	return sub_mat;
+}
+
+c_matrix submatrix_from_array(const double *arr, int orig_rows, int orig_cols, int row_start, int col_start, int row_end, int col_end)
+{
+	int rows = row_end - row_start + 1;
+	int cols = col_end - col_start + 1;
+
+	c_matrix mat = alloc_matrix(rows, cols);
+
+	for (int i = 0; i < rows; ++i)
+	{
+		for (int j = 0; j < cols; ++j)
+		{
+			int src_row = row_start + i;
+			int src_col = col_start + j;
+
+			double val = arr[src_row * orig_cols + src_col];
+			MAT_AT(&mat, i, j).value = val;
+			MAT_AT(&mat, i, j).row = i;
+			MAT_AT(&mat, i, j).col = j;
+		}
+	}
+	return mat;
+}
+
+c_matrix get_row(c_matrix *mat, int _row)
+{
+	return submatrix(mat, _row, 0, _row, mat->cols - 1);
+}
+
+c_matrix get_col(c_matrix *mat, int _col)
+{
+	return submatrix(mat, 0, _col, mat->rows - 1, _col);
+}
+
+c_matrix *get_prow(c_matrix *mat, int _row)
+{
+	c_matrix *out = malloc(sizeof(c_matrix));
+	*out = alloc_matrix(1, mat->cols);
+	for (int col = 0; col < mat->cols; ++col)
+	{
+		MAT_AT(out, 0, col).value = MAT_AT(mat, _row, col).value;
+		MAT_AT(out, 0, col).row = 0;
+		MAT_AT(out, 0, col).col = col;
+	}
+	return out;
+}
+
+c_matrix *get_pcol(c_matrix *mat, int _col)
+{
+	c_matrix *out = malloc(sizeof(c_matrix));
+	*out = alloc_matrix(mat->rows, 1);
+	for (int row = 0; row < mat->rows; ++row)
+	{
+		MAT_AT(out, 0, row).value = MAT_AT(mat, row, _col).value;
+		MAT_AT(out, 0, row).row = row;
+		MAT_AT(out, 0, row).col = 0;
+	}
+	return out;
 }
 
 c_matrix append_rows(const c_matrix *src_mat, const c_matrix *mat_bottom)
@@ -158,12 +243,12 @@ c_matrix append_rows(const c_matrix *src_mat, const c_matrix *mat_bottom)
 	for (int row = 0; row < src_mat->rows; ++row)
 	{
 		for (int col = 0; col < src_mat->cols; ++col)
-			arr[row * cols + col] = src_mat->data[row * src_mat->cols + col].value;
+			arr[row * cols + col] = MAT_AT(src_mat, row, col).value;
 	}
 	for (int row = 0; row < mat_bottom->rows; ++row)
 	{
 		for (int col = 0; col < mat_bottom->cols; ++col)
-			arr[(src_mat->rows + row) * cols + col] = mat_bottom->data[row * mat_bottom->cols + col].value;
+			arr[(src_mat->rows + row) * cols + col] = MAT_AT(mat_bottom, row, col).value;
 	}
 	c_matrix mat = create_matrix(arr, rows, cols);
 	free(arr);
@@ -180,9 +265,9 @@ c_matrix append_cols(const c_matrix *src_mat, const c_matrix *mat_right)
 	for (int row = 0; row < rows; ++row)
 	{
 		for (int col = 0; col < src_mat->cols; ++col)
-			arr[row * cols + col] = src_mat->data[row * src_mat->cols + col].value;
+			arr[row * cols + col] = MAT_AT(src_mat, row, col).value;
 		for (int col = 0; col < mat_right->cols; ++col)
-			arr[row * cols + (src_mat->cols + col)] = mat_right->data[row * mat_right->cols + col].value;
+			arr[row * cols + (src_mat->cols + col)] = MAT_AT(mat_right, row, col).value;
 	}
 	c_matrix mat = create_matrix(arr, rows, cols);
 	free(arr);

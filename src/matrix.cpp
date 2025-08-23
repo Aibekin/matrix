@@ -69,11 +69,11 @@ std::vector<double> matrix::Matrix::data() const { return to_raw_data(); }
 int matrix::Matrix::width() const { return _cols; }
 int matrix::Matrix::height() const { return _rows; }
 
-void matrix::Matrix::print_matrix() const
+void matrix::Matrix::print() const
 {
     std::vector<double> raw = to_raw_data();
     ::c_matrix mat = ::create_matrix(const_cast<double *>(raw.data()), _rows, _cols);
-    ::print_matrix(&mat);
+    PRINT_MATRIX(mat);
     ::free_matrix(&mat);
 }
 
