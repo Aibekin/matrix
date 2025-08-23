@@ -12,6 +12,7 @@ extern "C"
     c_matrix create_initial_matrix(double value, int _rows, int _cols);
     c_matrix create_zeros(int _rows, int _cols);
     c_matrix create_ones(int _rows, int _cols);
+    c_matrix create_random(int _rows, int cols);
 
     double find(const c_matrix *mat, int row, int col);
     coord find_el(const c_matrix *mat, double el);

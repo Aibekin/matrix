@@ -29,6 +29,12 @@ c_matrix create_ones(int _rows, int _cols)
 	return create_initial_matrix(1.0, _rows, _cols);
 }
 
+c_matrix create_random(int _rows, int _cols)
+{
+	double random = (double)rand() / (double)RAND_MAX;
+	return create_initial_matrix(random, _rows, _cols);
+}
+
 double find(const c_matrix *mat, int row, int col)
 {
 	if (!mat || row < 0 || col < 0 || row >= mat->rows || col >= mat->cols)
