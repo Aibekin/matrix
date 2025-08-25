@@ -3,10 +3,7 @@
 
 c_matrix create_initial_matrix(double value, int _rows, int _cols)
 {
-	c_matrix mat;
-	mat.rows = _rows;
-	mat.cols = _cols;
-	mat.data = malloc(sizeof(single_mat) * _rows * _cols);
+	c_matrix mat = alloc_matrix(_rows, _cols);
 	for (int row = 0; row < _rows; ++row)
 	{
 		for (int col = 0; col < _cols; ++col)
