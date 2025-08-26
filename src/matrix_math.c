@@ -31,6 +31,7 @@ void make_minor(const c_matrix *mat, c_matrix *newmat, int exclude_row, int excl
 
 double determinant(const c_matrix *mat)
 {
+    assert(mat->rows == mat->cols);
     if (mat->rows == 1)
     {
         return mat->data[0].value;
