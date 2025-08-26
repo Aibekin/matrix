@@ -103,3 +103,9 @@ c_matrix load_matrix_bin(const char *filename)
     fclose(f);
     return mat;
 }
+
+c_matrix *load_pmatrix_bin(const char *filename)
+{
+    c_matrix mat = load_matrix_bin(filename);
+    return &mat;
+}

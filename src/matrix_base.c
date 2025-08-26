@@ -57,3 +57,19 @@ void free_matrix(c_matrix *mat)
     free(mat->data);
     mat->data = NULL;
 }
+
+c_matrix *alloc_pmatrix(int _rows, int _cols)
+{
+    c_matrix *mat;
+    mat->rows = _rows;
+    mat->cols = _cols;
+    mat->data = malloc(sizeof(single_mat) * _rows * _cols);
+    return mat;
+}
+
+c_matrix *create_pmatrix(const double *arr, int _rows, int _cols)
+{
+    c_matrix *mat = alloc_pmatrix(_rows, _cols);
+    fill_matrix(mat, arr);
+    return mat;
+}

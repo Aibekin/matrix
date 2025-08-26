@@ -41,6 +41,9 @@ extern "C"
     void print_matrix(const c_matrix *mat, const char *name, size_t padding);
     void free_matrix(c_matrix *mat);
 
+    c_matrix *alloc_pmatrix(int _rows, int _cols);
+    c_matrix *create_pmatrix(const double *arr, int _rows, int _cols);
+
 #ifdef __cplusplus
 }
 #endif

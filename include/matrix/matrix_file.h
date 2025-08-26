@@ -18,6 +18,8 @@ extern "C"
 
     void save_matrix_bin(const char *filename, const c_matrix *mat);
     c_matrix load_matrix_bin(const char *filename);
+
+    c_matrix *load_pmatrix_bin(const char *filename);
 #ifdef __cplusplus
 }
 #endif

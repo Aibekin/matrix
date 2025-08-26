@@ -28,10 +28,7 @@ c_matrix create_ones(int _rows, int _cols)
 
 c_matrix create_random(int _rows, int _cols, double low, double high)
 {
-	c_matrix mat;
-	mat.rows = _rows;
-	mat.cols = _cols;
-	mat.data = malloc(sizeof(single_mat) * _rows * _cols);
+	c_matrix mat = alloc_matrix(_rows, _cols);
 	for (int row = 0; row < _rows; ++row)
 	{
 		for (int col = 0; col < _cols; ++col)
@@ -39,6 +36,46 @@ c_matrix create_random(int _rows, int _cols, double low, double high)
 			MAT_AT(&mat, row, col).value = (double)rand() / (double)RAND_MAX * (high - low) + low;
 			MAT_AT(&mat, row, col).row = row;
 			MAT_AT(&mat, row, col).col = col;
+		}
+	}
+	return mat;
+}
+
+c_matrix *create_initial_pmatrix(double value, int _rows, int _cols)
+{
+	c_matrix *mat = alloc_pmatrix(_rows, _cols);
+	for (int row = 0; row < _rows; ++row)
+	{
+		for (int col = 0; col < _cols; ++col)
+		{
+			MAT_AT(mat, row, col).value = value;
+			MAT_AT(mat, row, col).row = row;
+			MAT_AT(mat, row, col).col = col;
+		}
+	}
+	return mat;
+}
+
+c_matrix *create_pzeros(int _rows, int _cols)
+{
+	return create_initial_pmatrix(0.0, _rows, _cols);
+}
+
+c_matrix *create_pones(int _rows, int _cols)
+{
+	return create_initial_pmatrix(1.0, _rows, _cols);
+}
+
+c_matrix *create_prandom(int _rows, int _cols, double low, double high)
+{
+	c_matrix *mat = alloc_pmatrix(_rows, _cols);
+	for (int row = 0; row < _rows; ++row)
+	{
+		for (int col = 0; col < _cols; ++col)
+		{
+			MAT_AT(mat, row, col).value = (double)rand() / (double)RAND_MAX * (high - low) + low;
+			MAT_AT(mat, row, col).row = row;
+			MAT_AT(mat, row, col).col = col;
 		}
 	}
 	return mat;
@@ -148,11 +185,15 @@ double max_of_matrix(const c_matrix *mat)
 
 c_matrix submatrix(const c_matrix *mat, int row_start, int col_start, int row_end, int col_end)
 {
-	if (row_start < 0 || row_end >= mat->rows || col_start < 0 || col_end >= mat->cols)
-	{
-		fprintf(stderr, "Submatrix indices out of bounds\n");
-		exit(EXIT_FAILURE);
-	}
+	assert(row_start < 0);
+	assert(row_end >= mat->rows);
+	assert(col_start < 0);
+	assert(col_end >= mat->cols);
+	// if (row_start < 0 || row_end >= mat->rows || col_start < 0 || col_end >= mat->cols)
+	// {
+	// 	fprintf(stderr, "Submatrix indices out of bounds\n");
+	// 	exit(EXIT_FAILURE);
+	// }
 
 	int rows = row_end - row_start + 1;
 	int cols = col_end - col_start + 1;
@@ -269,4 +310,43 @@ c_matrix append_cols(const c_matrix *src_mat, const c_matrix *mat_right)
 	c_matrix mat = create_matrix(arr, rows, cols);
 	free(arr);
 	return mat;
+}
+
+void append_rows_to_matrix(c_matrix *mat, const c_matrix *mat_bottom)
+{
+	int rows = mat->rows + mat_bottom->rows;
+	int cols = mat->cols;
+
+	double *arr = malloc(sizeof(double) * rows * cols);
+
+	for (int row = 0; row < mat->rows; ++row)
+	{
+		for (int col = 0; col < mat->cols; ++col)
+			arr[row * cols + col] = MAT_AT(mat, row, col).value;
+	}
+	for (int row = 0; row < mat_bottom->rows; ++row)
+	{
+		for (int col = 0; col < mat_bottom->cols; ++col)
+			arr[(mat->rows + row) * cols + col] = MAT_AT(mat_bottom, row, col).value;
+	}
+	mat = create_pmatrix(arr, rows, cols);
+	free(arr);
+}
+
+void append_cols_to_matrix(c_matrix *mat, const c_matrix *mat_right)
+{
+	int rows = mat->rows;
+	int cols = mat->cols + mat_right->cols;
+
+	double *arr = malloc(sizeof(double) * rows * cols);
+
+	for (int row = 0; row < rows; ++row)
+	{
+		for (int col = 0; col < mat->cols; ++col)
+			arr[row * cols + col] = MAT_AT(mat, row, col).value;
+		for (int col = 0; col < mat_right->cols; ++col)
+			arr[row * cols + (mat->cols + col)] = MAT_AT(mat_right, row, col).value;
+	}
+	mat = create_pmatrix(arr, rows, cols);
+	free(arr);
 }
