@@ -28,7 +28,6 @@ void make_minor(const c_matrix *mat, c_matrix *newmat, int exclude_row, int excl
         ++idi;
     }
 }
-
 double determinant(const c_matrix *mat)
 {
     assert(mat->rows == mat->cols);
@@ -129,7 +128,6 @@ c_matrix addition(const c_matrix *mat1, const c_matrix *mat2)
     free(arr);
     return result;
 }
-
 c_matrix substraction(const c_matrix *mat1, const c_matrix *mat2)
 {
     double *arr = malloc(sizeof(double) * mat1->rows * mat1->cols);
@@ -144,7 +142,6 @@ c_matrix substraction(const c_matrix *mat1, const c_matrix *mat2)
 
     return create_matrix(arr, mat1->rows, mat1->cols);
 }
-
 c_matrix multiply(const c_matrix *mat1, const c_matrix *mat2)
 {
     assert(mat1->cols == mat2->rows);
@@ -174,7 +171,6 @@ c_matrix multiply(const c_matrix *mat1, const c_matrix *mat2)
     free(result_data);
     return result;
 }
-
 c_matrix division(const c_matrix *mat1, const c_matrix *mat2)
 {
     c_matrix inv_mat = inverse(mat2);
@@ -193,7 +189,6 @@ void add_matrix_to_scalar(c_matrix *mat, double scalar)
         }
     }
 }
-
 void substract_matrix_from_scalar(c_matrix *mat, double scalar)
 {
     for (int row = 0; row < mat->rows; ++row)
@@ -204,7 +199,6 @@ void substract_matrix_from_scalar(c_matrix *mat, double scalar)
         }
     }
 }
-
 void multiply_matrix_by_scalar(c_matrix *mat, double scalar)
 {
     for (int row = 0; row < mat->rows; ++row)
@@ -215,7 +209,6 @@ void multiply_matrix_by_scalar(c_matrix *mat, double scalar)
         }
     }
 }
-
 void divide_matrix_by_scalar(c_matrix *mat, double scalar)
 {
     for (int row = 0; row < mat->rows; ++row)

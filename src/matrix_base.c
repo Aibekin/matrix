@@ -9,7 +9,6 @@ c_matrix alloc_matrix(int _rows, int _cols)
     mat.data = malloc(sizeof(single_mat) * _rows * _cols);
     return mat;
 }
-
 void fill_matrix(c_matrix *mat, const double *arr)
 {
     for (int row = 0; row < mat->rows; ++row)
@@ -29,12 +28,6 @@ c_matrix create_matrix(const double *arr, int _rows, int _cols)
     c_matrix mat = alloc_matrix(_rows, _cols);
     fill_matrix(&mat, arr);
     return mat;
-}
-
-c_matrix *alloc_matrix_array(int _amount)
-{
-    c_matrix *mat_array = malloc(_amount * sizeof(c_matrix));
-    return mat_array;
 }
 
 void print_matrix(const c_matrix *mat, const char *name, size_t padding)
@@ -66,10 +59,14 @@ c_matrix *alloc_pmatrix(int _rows, int _cols)
     mat->data = malloc(sizeof(single_mat) * _rows * _cols);
     return mat;
 }
-
 c_matrix *create_pmatrix(const double *arr, int _rows, int _cols)
 {
     c_matrix *mat = alloc_pmatrix(_rows, _cols);
     fill_matrix(mat, arr);
     return mat;
+}
+c_matrix *alloc_matrix_array(int _amount)
+{
+    c_matrix *mat_array = malloc(_amount * sizeof(c_matrix));
+    return mat_array;
 }

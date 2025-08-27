@@ -15,17 +15,14 @@ c_matrix create_initial_matrix(double value, int _rows, int _cols)
 	}
 	return mat;
 }
-
 c_matrix create_zeros(int _rows, int _cols)
 {
 	return create_initial_matrix(0.0, _rows, _cols);
 }
-
 c_matrix create_ones(int _rows, int _cols)
 {
 	return create_initial_matrix(1.0, _rows, _cols);
 }
-
 c_matrix create_random(int _rows, int _cols, double low, double high)
 {
 	c_matrix mat = alloc_matrix(_rows, _cols);
@@ -55,17 +52,14 @@ c_matrix *create_initial_pmatrix(double value, int _rows, int _cols)
 	}
 	return mat;
 }
-
 c_matrix *create_pzeros(int _rows, int _cols)
 {
 	return create_initial_pmatrix(0.0, _rows, _cols);
 }
-
 c_matrix *create_pones(int _rows, int _cols)
 {
 	return create_initial_pmatrix(1.0, _rows, _cols);
 }
-
 c_matrix *create_prandom(int _rows, int _cols, double low, double high)
 {
 	c_matrix *mat = alloc_pmatrix(_rows, _cols);
@@ -101,7 +95,6 @@ double find(const c_matrix *mat, int row, int col)
 
 	return MAT_AT(mat, row, col).value;
 }
-
 coord find_el(const c_matrix *mat, double el)
 {
 	coord res = {-1, -1};
@@ -149,12 +142,10 @@ double sum_of_matrix(const c_matrix *mat)
 	}
 	return res;
 }
-
 double average_of_matrix(const c_matrix *mat)
 {
 	return sum_of_matrix(mat) / (mat->cols * mat->rows);
 }
-
 double min_of_matrix(const c_matrix *mat)
 {
 	double min = mat->data[0].value;
@@ -168,7 +159,6 @@ double min_of_matrix(const c_matrix *mat)
 	}
 	return min;
 }
-
 double max_of_matrix(const c_matrix *mat)
 {
 	double min = mat->data[0].value;
@@ -211,7 +201,6 @@ c_matrix submatrix(const c_matrix *mat, int row_start, int col_start, int row_en
 	free(arr);
 	return sub_mat;
 }
-
 c_matrix submatrix_from_array(const double *arr, int orig_rows, int orig_cols, int row_start, int col_start, int row_end, int col_end)
 {
 	int rows = row_end - row_start + 1;
@@ -239,7 +228,6 @@ c_matrix get_row(c_matrix *mat, int _row)
 {
 	return submatrix(mat, _row, 0, _row, mat->cols - 1);
 }
-
 c_matrix get_col(c_matrix *mat, int _col)
 {
 	return submatrix(mat, 0, _col, mat->rows - 1, _col);
@@ -257,7 +245,6 @@ c_matrix *get_prow(c_matrix *mat, int _row)
 	}
 	return out;
 }
-
 c_matrix *get_pcol(c_matrix *mat, int _col)
 {
 	c_matrix *out = malloc(sizeof(c_matrix));
@@ -292,7 +279,6 @@ c_matrix append_rows(const c_matrix *src_mat, const c_matrix *mat_bottom)
 	free(arr);
 	return mat;
 }
-
 c_matrix append_cols(const c_matrix *src_mat, const c_matrix *mat_right)
 {
 	int rows = src_mat->rows;
@@ -332,7 +318,6 @@ void append_rows_to_matrix(c_matrix *mat, const c_matrix *mat_bottom)
 	mat = create_pmatrix(arr, rows, cols);
 	free(arr);
 }
-
 void append_cols_to_matrix(c_matrix *mat, const c_matrix *mat_right)
 {
 	int rows = mat->rows;
